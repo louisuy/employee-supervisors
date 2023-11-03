@@ -19,7 +19,7 @@ export async function POST(request) {
     ) {
       console.log(`${supervisor} will supervise ${name}.`);
     } else {
-      console.log(`${supervisor} is not an existing employee.`);
+      console.log(`${supervisor} is going to be a top level supervisor.`);
     }
   });
 
