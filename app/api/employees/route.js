@@ -5,42 +5,29 @@ export async function GET(request) {
   return Response.json(res);
 }
 
+function iterateEmployees(json) {
+  // console.log(json)
+  Object.entries(json).forEach(([key, value]) => {
+    console.log(key)
+    let child = value
+    while (typeof child === 'object') {
+      Object.values(child).forEach((team) => {
+        Object.entries(team).forEach((employee, members) => {
+          console.log(employee, members)
+          if (typeof members === 'object') {
+            iterateEmployees(members)
+          }
+        })
+      })
+      break
+    }
+  })
+}
+
 export async function POST(request) {
   const hire = await request.json();
 
-  Object.entries(hire).forEach(([name, supervisor]) => {
-    const topLevelSupervisor = Object.keys(employees).includes(supervisor);
-    const supervisedSupervisor = Object.values(employees).some((arr) =>
-      arr.some((employee) => Object.keys(employee)[0] === supervisor)
-    );
-    const employeeExists = Object.values(employees).some((arr) =>
-      arr.some((employee) => Object.keys(employee)[0] === name)
-    );
-
-    if (employeeExists) {
-      console.log(`${name} is already an existing employee.`);
-    } else if (topLevelSupervisor) {
-      employees[supervisor].push({ [name]: [] });
-      console.log(`${supervisor} (top level) will supervise ${name}.`);
-    } else if (supervisedSupervisor) {
-      Object.values(employees).forEach((arr) => {
-        arr.forEach((employee) => {
-          const [supervisorName, supervised] = Object.entries(employee)[0];
-          if (supervisorName === supervisor) {
-            supervised.push({ [name]: [] });
-            console.log(`${supervisor} (supervised) will supervise ${name}.`);
-          } else {
-            Object.values(supervised).forEach((nestedEmployee) => {
-              nestedEmployee.hasOwnProperty(supervisor) &&
-                nestedEmployee[supervisor].push({ [name]: [] });
-            });
-          }
-        });
-      });
-    } else {
-      console.log(`${supervisor} is going to be a top level supervisor.`);
-    }
-  });
+  iterateEmployees(employees)
 
   return Response.json(employees);
 }
