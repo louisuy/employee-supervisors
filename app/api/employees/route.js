@@ -5,33 +5,38 @@ export async function GET(request) {
   return Response.json(res);
 }
 
-function iterateEmployees(json) {
+function iterateEmployees(json, searchName, newValue) {
   Object.entries(json).forEach(([key, value]) => {
-    console.log(key);
+    if (key === searchName) {
+      json[key].push(newValue);
+    }
 
     if (Array.isArray(value)) {
-      value.forEach((team) => {
+      value.forEach((team) =>
         Object.entries(team).forEach(([employee, members]) => {
-          console.log(employee);
-          if (Array.isArray(members)) {
-            members.forEach((member) => {
-              if (typeof member === "object" && member !== null) {
-                iterateEmployees(member);
-              }
-            });
+          if (employee === searchName) {
+            team[employee].push(newValue);
           }
-        });
-      });
-    } else if (typeof value === "object" && value !== null) {
-      iterateEmployees(value);
+
+          Array.isArray(members) && members.forEach((member) =>
+            typeof member === 'object' && member !== null && iterateEmployees(member, searchName, newValue)
+          );
+        })
+      );
+    } else if (typeof value === 'object' && value !== null) {
+      iterateEmployees(value, searchName, newValue);
     }
   });
 }
 
 export async function POST(request) {
   const hire = await request.json();
-
-  iterateEmployees(employees);
+  
+  Object.entries(hire).forEach(([name, supervisor]) => {
+    let newHire = { [name] : [] }
+    console.log(supervisor, newHire)
+    iterateEmployees(employees, supervisor, newHire)
+  })
 
   return Response.json(employees);
 }
