@@ -5,30 +5,41 @@ export async function GET(request) {
   return Response.json(res);
 }
 
-function iterateEmployees(supervisor, name) {
+function iterateEmployees(reqSupervisor, name) {
+  let found = false;
+
   Object.entries(employees).forEach(([key, value]) => {
-    // If the supervisor is the top level entry key, push the name into the supervisor.
-    if (key === supervisor) {
-      employees[key].push({[name]:[]});
+    let newHireObj = { [name]: [] };
+
+    // If the supervisor is top level, push employee.
+    if (key === reqSupervisor) {
+      employees[key].push(newHireObj);
+      found = true;
+      return;
     }
 
-    if (Array.isArray(value)) {
-      value.forEach((team) =>
+    // The next piece of code will run if the supervisor isn't top level.
+    if (Array.isArray(value)) { // If the supervisor's value is an array,
+      value.forEach((team) => { // Iterate through the array, "team", is the object children.
         Object.entries(team).forEach(([employee, members]) => {
-          if (employee === supervisor) {
-            team[employee].push(name);
+          if (employee === reqSupervisor) { // If the team object key, is the requested supervisor, push the newHireObj.
+            team[employee].push(newHireObj);
+            found = true;
           }
-
-          Array.isArray(members) && members.forEach((member) =>
-            typeof member === 'object' && member !== null && iterateEmployees(member, supervisor, name)
-          );
+          // Array.isArray(members) && members.forEach((subMember) =>
+          //   iterateEmployees(subMember, name)
+          // );
         })
-      );
-    } else if (typeof value === 'object' && value !== null) {
-      iterateEmployees(value, supervisor, name);
+      });
+      // } else if (typeof value === 'object' && value !== null) {
+      //   iterateEmployees(value, name);
     }
+  });
+
+  // Add the new hire as a top-level entry if the supervisor is not found
+  if (!found) {
+    employees[reqSupervisor] = [{ [name]: [] }];
   }
-  );
 }
 
 export async function POST(request) {
@@ -37,7 +48,7 @@ export async function POST(request) {
   Object.entries(hire).forEach(([name, supervisor]) => {
     // let newHire = { [name]: [] };
 
-    iterateEmployees(supervisor, name)
+    iterateEmployees(supervisor, name);
 
     // if (iterateEmployees(supervisor) && iterateEmployees(name)) { // If the employee and its supervisor exist.
     //   // Take the object of the employee and it's children, and make the child of the supervisor.
@@ -46,7 +57,6 @@ export async function POST(request) {
     // } else if (!iterateEmployees(supervisor) && !iterateEmployees(name)) { // If the does not exist, and the employee does not exist.
     //   // Push a new object, to the top level of the employee json, and push the newHire as it's child: {[supervisor]: [{[name]: []}]}
     // }
-
   });
 
   return Response.json(employees);
