@@ -6,28 +6,32 @@ export async function GET(request) {
 }
 
 function iterateEmployees(json) {
-  // console.log(json)
   Object.entries(json).forEach(([key, value]) => {
-    console.log(key)
-    let child = value
-    while (typeof child === 'object') {
-      Object.values(child).forEach((team) => {
-        Object.entries(team).forEach((employee, members) => {
-          console.log(employee, members)
-          if (typeof members === 'object') {
-            iterateEmployees(members)
+    console.log(key);
+
+    if (Array.isArray(value)) {
+      value.forEach((team) => {
+        Object.entries(team).forEach(([employee, members]) => {
+          console.log(employee);
+          if (Array.isArray(members)) {
+            members.forEach((member) => {
+              if (typeof member === "object" && member !== null) {
+                iterateEmployees(member);
+              }
+            });
           }
-        })
-      })
-      break
+        });
+      });
+    } else if (typeof value === "object" && value !== null) {
+      iterateEmployees(value);
     }
-  })
+  });
 }
 
 export async function POST(request) {
   const hire = await request.json();
 
-  iterateEmployees(employees)
+  iterateEmployees(employees);
 
   return Response.json(employees);
 }
