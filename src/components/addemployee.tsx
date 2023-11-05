@@ -1,0 +1,1 @@
+export default function AddEmployee(second) {third}
