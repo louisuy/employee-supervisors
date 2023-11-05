@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Wafeeq",
+    "supervisor": "Ali"
+  },
+  {
+    "name": "Aysar",
+    "supervisor": "Wafeeq"
+  },
+  {
+    "name": "Moied",
+    "supervisor": "Aysar"
+  },
+  {
+    "name": "Michael",
+    "supervisor": "Ali"
+  },
+  {
+    "name": "Roubi",
+    "supervisor": "Michael"
+  },
+  {
+    "name": "Louis",
+    "supervisor": "Aysar"
+  }
+]
