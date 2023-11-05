@@ -19,55 +19,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import AddEmployee from "@/components/AddEmployee";
 
-const employees = [
-  {
-    name: "Wafeeq",
-    supervisor: "Ali",
-  },
-];
+import employees from "@/data/employeesUiObject.json"
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
       <h1 className="text-5xl font-bold">Employee Supervisors</h1>
       <div className="p-5">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">Add Employee</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Add Employee</DialogTitle>
-              <DialogDescription>
-                Add a new employee to your team.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input id="name" className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="supervisor" className="text-right">
-                  Supervisor
-                </Label>
-                <Input id="supervisor" className="col-span-3" />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit">Save changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <AddEmployee/>
       </div>
 
       <Table>
-        <TableCaption>
+        {/* <TableCaption>
           A list of your employees and their supervisors.
-        </TableCaption>
+        </TableCaption> */}
         <TableHeader>
           <TableRow>
             <TableHead>Employee Name</TableHead>
