@@ -1,63 +1,81 @@
-import employees from "@/data/employees.json";
+import fs from 'fs';
+import path from 'path';
 
-export async function GET(request) {
-  const res = employees;
-  return Response.json(res);
-}
+const dataFilePath = path.join(process.cwd(), 'data', 'employees.json'); // Define the data file path
 
-function iterateEmployees(reqSupervisor, name) {
-  let found = false;
-
-  Object.entries(employees).forEach(([key, value]) => {
-    let newHireObj = { [name]: [] };
-
-    // If the supervisor is top level, push employee.
-    if (key === reqSupervisor) {
-      employees[key].push(newHireObj);
-      found = true;
-      return;
+// Function to read JSON data from a file
+function readDataFromFile() {
+  try {
+    if (fs.existsSync(dataFilePath)) {
+      const data = fs.readFileSync(dataFilePath, 'utf8');
+      return JSON.parse(data);
+    } else {
+      // If the file does not exist, create an empty object and save it
+      const emptyData = {};
+      writeDataToFile(emptyData);
+      return emptyData;
     }
-
-    // The next piece of code will run if the supervisor isn't top level.
-    if (Array.isArray(value)) { // If the supervisor's value is an array,
-      value.forEach((team) => { // Iterate through the array, "team", is the object children.
-        Object.entries(team).forEach(([employee, members]) => {
-          if (employee === reqSupervisor) { // If the team object key, is the requested supervisor, push the newHireObj.
-            team[employee].push(newHireObj);
-            found = true;
-          }
-          // Array.isArray(members) && members.forEach((subMember) =>
-          //   iterateEmployees(subMember, name)
-          // );
-        })
-      });
-      // } else if (typeof value === 'object' && value !== null) {
-      //   iterateEmployees(value, name);
-    }
-  });
-
-  // Add the new hire as a top-level entry if the supervisor is not found
-  if (!found) {
-    employees[reqSupervisor] = [{ [name]: [] }];
+  } catch (err) {
+    console.error('Error reading JSON file:', err);
+    return {};
   }
 }
 
+// Function to write JSON data to a file
+function writeDataToFile(data) {
+  try {
+    const jsonData = JSON.stringify(data, null, 2);
+    fs.writeFileSync(dataFilePath, jsonData, 'utf8');
+  } catch (err) {
+    console.error('Error writing JSON file:', err);
+  }
+}
+
+export async function GET(request) {
+  const employeeData = readDataFromFile();
+  return Response.json(employeeData);
+}
+
+function iterateEmployees(supervisor, newHire, data) {
+  let found = false;
+
+  function processTeam(team) {
+    for (const key in team) {
+      if (team.hasOwnProperty(key)) {
+        if (key === supervisor) {
+          if (!team[key].some((member) => member.hasOwnProperty(newHire))) {
+            team[key].push({ [newHire]: [] });
+          }
+          found = true;
+        }
+        if (Array.isArray(team[key])) {
+          team[key].forEach((subTeam) => {
+            processTeam(subTeam);
+          });
+        }
+      }
+    }
+  }
+
+  processTeam(data);
+
+  if (!found) {
+    data[supervisor] = [{ [newHire]: [] }];
+  }
+}
+
+
 export async function POST(request) {
-  const hire = await request.json();
+  const newHires = await request.json();
+  const employees = readDataFromFile();
 
-  Object.entries(hire).forEach(([name, supervisor]) => {
-    // let newHire = { [name]: [] };
-
-    iterateEmployees(supervisor, name);
-
-    // if (iterateEmployees(supervisor) && iterateEmployees(name)) { // If the employee and its supervisor exist.
-    //   // Take the object of the employee and it's children, and make the child of the supervisor.
-    // } else if (iterateEmployees(supervisor) && !iterateEmployees(name)) { // If the supervisor exists.
-    //   // Push the newHire to be child of that supervisor.
-    // } else if (!iterateEmployees(supervisor) && !iterateEmployees(name)) { // If the does not exist, and the employee does not exist.
-    //   // Push a new object, to the top level of the employee json, and push the newHire as it's child: {[supervisor]: [{[name]: []}]}
-    // }
+  // Modify the data as needed
+  Object.entries(newHires).forEach(([name, supervisor]) => {
+    iterateEmployees(supervisor, name, employees);
   });
+
+  // Write the modified data back to the file
+  writeDataToFile(employees);
 
   return Response.json(employees);
 }
