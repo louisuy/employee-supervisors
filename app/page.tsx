@@ -1,3 +1,4 @@
+import AddEmployee from "@/components/AddEmployee";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,7 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import AddEmployee from "@/components/AddEmployee";
 
 import employees from "@/data/employeesUiObject.json"
 
@@ -32,9 +32,9 @@ export default function Home() {
       </div>
 
       <Table>
-        {/* <TableCaption>
+        <TableCaption>
           A list of your employees and their supervisors.
-        </TableCaption> */}
+        </TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Employee Name</TableHead>

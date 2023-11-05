@@ -1,14 +1,18 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
-const employeesPath = path.join(process.cwd(), 'data', 'employees.json');
-const employeesUiObjectPath = path.join(process.cwd(), 'data', 'employeesUiObject.json');
+const employeesPath = path.join(process.cwd(), "data", "employees.json");
+const employeesUiObjectPath = path.join(
+  process.cwd(),
+  "data",
+  "employeesUiObject.json"
+);
 
 // Function to read JSON data from a file
 function readDataFromFile(dataFilePath) {
   try {
     if (fs.existsSync(dataFilePath)) {
-      const data = fs.readFileSync(dataFilePath, 'utf8');
+      const data = fs.readFileSync(dataFilePath, "utf8");
       return JSON.parse(data);
     } else {
       // If the file does not exist, create an empty object and save it
@@ -17,7 +21,7 @@ function readDataFromFile(dataFilePath) {
       return emptyData;
     }
   } catch (err) {
-    console.error('Error reading JSON file:', err);
+    console.error("Error reading JSON file:", err);
     return {};
   }
 }
@@ -26,9 +30,9 @@ function readDataFromFile(dataFilePath) {
 function writeDataToFile(data, dataFilePath) {
   try {
     const jsonData = JSON.stringify(data, null, 2);
-    fs.writeFileSync(dataFilePath, jsonData, 'utf8');
+    fs.writeFileSync(dataFilePath, jsonData, "utf8");
   } catch (err) {
-    console.error('Error writing JSON file:', err);
+    console.error("Error writing JSON file:", err);
   }
 }
 
@@ -66,12 +70,19 @@ function iterateEmployees(supervisor, newHire, data) {
 }
 
 function updateEmployeesObject(name, supervisor, data) {
-  if (!Array.isArray(data)) {
-    data = []; // Initialize as an array if not already
-  }
-  data.push({ name, supervisor });
-}
+  // Check if the employee already exists in the data
+  const existingEmployeeIndex = data.findIndex(
+    (employee) => employee.name === name
+  );
 
+  if (existingEmployeeIndex !== -1) {
+    // If the employee exists, update the supervisor
+    data[existingEmployeeIndex].supervisor = supervisor;
+  } else {
+    // If the employee doesn't exist, add a new entry
+    data.push({ name, supervisor });
+  }
+}
 
 export async function POST(request) {
   const newHires = await request.json();
@@ -93,5 +104,5 @@ export async function POST(request) {
   writeDataToFile(employees, employeesPath);
   writeDataToFile(employeesUiObject, employeesUiObjectPath);
 
-  return Response.json(employees);
+  return Response.json(employees, { status: 201 });
 }
