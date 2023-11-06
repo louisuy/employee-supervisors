@@ -8,6 +8,12 @@ This web application is built using **Next.js** with App Router and APIs, **Cler
 
 You can access the live demo of this project at [https://employee-supervisors.vercel.app/](https://employee-supervisors.vercel.app/)
 
+**Bug:** Live Demo does not have write access to the JSON file.
+  
+  Due to the limitations of the Vercel platform, the Live Demo deployed on Vercel does not have write access to the JSON file. As a result, modifications to the JSON data will not be reflected in the deployed version.
+
+  To modify and test the JSON data, please run the application locally.
+
 ## Features
 
 - Edit employee details, including name and supervisor
