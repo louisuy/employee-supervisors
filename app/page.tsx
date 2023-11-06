@@ -14,13 +14,27 @@ import {
 } from "@/components/ui/table";
 
 import employees from "@/data/employeesUiObject.json";
-import { ClerkProvider, SignIn, SignedIn, SignedOut } from "@clerk/nextjs";
+import {
+  ClerkProvider,
+  SignIn,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 import Link from "next/link";
 
 export default function Home() {
   return (
     <ClerkProvider>
       <SignedIn>
+        <nav className="flex justify-between p-5 bg-white  drop-shadow-md">
+          <Link href={'/'} className="pt-1 hover:font-medium transition-all">
+            Employee Management App
+          </Link>
+          <div>
+            <UserButton />
+          </div>
+        </nav>
         <main className="flex min-h-screen flex-col items-center p-24">
           <h1 className="text-5xl font-bold">Employee Supervisors</h1>
           <div className="p-5 flex gap-2">
@@ -95,10 +109,24 @@ export default function Home() {
           <div className="">
             <p className="text-3xl w-1/2">
               Welcome to the <br />
-              <span className="font-bold"> Employees Supervisor Management App</span>
+              <span className="font-bold">
+                {" "}
+                Employees Supervisor Management App
+              </span>
             </p>
             <p className="pt-10 w-1/2">
-              This application is a technical challenge for the Junior Fullstack Developer role at FlipAE.<br/><br/>This was created by <Link className="text-stone-400 hover:text-cyan-700 transition-all" href={'https://github.com/louisuy'} target="_blank">Louis Uy</Link>
+              This application is a technical challenge for the Junior Fullstack
+              Developer role at FlipAE.
+              <br />
+              <br />
+              This was created by{" "}
+              <Link
+                className="text-stone-400 hover:text-cyan-700 transition-all"
+                href={"https://github.com/louisuy"}
+                target="_blank"
+              >
+                Louis Uy
+              </Link>
             </p>
           </div>
           <div>
